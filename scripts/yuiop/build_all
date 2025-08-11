@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -eu
+
+ALL=0
+
+while getopts "a" OPT ; do
+  case $OPT in
+    a) ALL=1 ;;
+  esac
+done
+
+COMPILE=$(dirname "$0")/../docker_qmk_compile
+
+"$COMPILE" yuiop/yuiop60hh5 test
+"$COMPILE" yuiop/yuiop60hh5 default
+"$COMPILE" yuiop/yuiop60hh5 kaoriya
+
+if [ $ALL -eq 0 ] ; then
+  exit 0
+fi
+
+#"$COMPILE" yuiop/yuiop22rs	default
+#"$COMPILE" yuiop/yuiop27	default
+#"$COMPILE" yuiop/yuiop2pd	default
+#"$COMPILE" yuiop/yuiop31rs	test
+#"$COMPILE" yuiop/yuiop32dm	default
+#"$COMPILE" yuiop/yuiop47	default
+#"$COMPILE" yuiop/yuiop50d	default
+#"$COMPILE" yuiop/yuiop50d	test
+#"$COMPILE" yuiop/yuiop60hh3	default
+#"$COMPILE" yuiop/yuiop60hh3	test
+#"$COMPILE" yuiop/yuiop60hh4	default
+#"$COMPILE" yuiop/yuiop60hh4	test
+"$COMPILE" yuiop/yuiop60hh5	dualgui
+"$COMPILE" yuiop/yuiop60hh5	nicola
+#"$COMPILE" yuiop/yuiop60hh5	test
+#"$COMPILE" yuiop/yuiop63hhs	default
