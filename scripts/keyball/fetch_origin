@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -eu
+
+KEYBALL_DIR="${KEYBALL_DIR:-../keyball/qmk_firmware/keyboards/keyball}"
+
+echo $KEYBALL_DIR
+
+if [ ! -d "$KEYBALL_DIR" ] ; then
+  echo "Not found keyball directory: $KEYBALL_DIR"
+  exit 1
+fi
+
+cp -Rp "$KEYBALL_DIR" keyboards/
+#find keyboards/keyball -type f -regex '.*\.\(c\|h\|json\|md\)' | xargs dos2unix -q
