@@ -28,7 +28,7 @@ fi
 
 # Start the container
 docker run --rm -it \
-  -v "$QMKFM_VOLUME":/qmk_firmware \
+  -v "$QMKFM_VOLUME":/qmk_firmware:ro \
   -v ./keyboards:/qmk_firmware/keyboards \
   -v ./build:/qmk_firmware/.build \
   -w /qmk_firmware \
