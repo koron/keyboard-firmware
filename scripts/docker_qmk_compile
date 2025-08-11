@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -eu
+
+case $(uname -s) in
+  MINGW*) export MSYS2_ARG_CONV_EXCL="*" ;;
+  MSYS*)  export MSYS2_ARG_CONV_EXCL="*" ;;
+esac
+
+show_help() {
+  cat <<EOF
+USAGE $0 [OPTIONS] {keyboard} {keymap}
+
+OPTIONS:
+
+  -C        Display without colors
+  -j {n}    Set the number of parallel make jobs (default: 4)
+  -h        Show this message
+EOF
+  exit 1
+}
+
+OPTIONS=()
+JOBS=4
+
+while getopts "Chj:" OPT ; do
+  case $OPT in
+    C) OPTIONS+=(-e COLOR=false) ;;
+    h) show_help ;;
+    j) JOBS="$OPTARG" ;;
+    *) show_help ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -lt 2 ] ; then
+  show_help
+fi
+
+KEYBOARD=$1 ; shift
+KEYMAP=$1 ; shift
+if [ ! -d "keyboards/${KEYBOARD}/keymaps/${KEYMAP}" ] ; then
+  echo "Not found keyboad and keymap: keyboards/${KEYBOARD}/keymaps/${KEYMAP}"
+  exit 1
+fi
+
+$(dirname "$0")/docker_run qmk compile -j "$JOBS" -e SKIP_GIT=yes -e KEEP_BIN=yes "${OPTIONS[@]}" -kb "$KEYBOARD" -km "$KEYMAP"

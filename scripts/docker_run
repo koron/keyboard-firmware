@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -eu
+
+QMKFM_VERSION="${QMKFM_VERSION:-0.22.14}"
+QMKFM_VOLUME="qmkfm-${QMKFM_VERSION}"
+
+case $(uname -s) in
+  MINGW*) export MSYS2_ARG_CONV_EXCL="*" ;;
+  MSYS*)  export MSYS2_ARG_CONV_EXCL="*" ;;
+esac
+
+# Create the volume to store qmk/qmk_firmware source
+if ! docker volume inspect "$QMKFM_VOLUME" > /dev/null 2>&1 ; then
+  docker volume create "$QMKFM_VOLUME" > /dev/null
+  echo "volume $QMKFM_VOLUME created"
+fi
+
+# Clone github.com/qmk/qmk_firmware to /qmk_firmware
+docker run --rm -it \
+  -v "$QMKFM_VOLUME":/qmk_firmware \
+  ghcr.io/qmk/qmk_cli:latest \
+  bash -c "if [ ! -e /qmk_firmware/.git/ ] ; then git clone --branch "$QMKFM_VERSION" --depth 1 --recurse-submodules --shallow-submodules http://github.com/qmk/qmk_firmware /qmk_firmware ; fi"
+
+if [ ! -e ./build ] ; then
+  mkdir -p ./build
+fi
+
+# Start the container
+docker run --rm -it \
+  -v "$QMKFM_VOLUME":/qmk_firmware \
+  -v ./keyboards:/qmk_firmware/keyboards \
+  -v ./build:/qmk_firmware/.build \
+  -w /qmk_firmware \
+  ghcr.io/qmk/qmk_cli:latest "$@"
