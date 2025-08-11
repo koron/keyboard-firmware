@@ -1,20 +1,19 @@
-```
-docker volume create qmk_firmware
-docker run --rm -it -v qmk_firmware:/qmk_firmware -w //qmk_firmware ghcr.io/qmk/qmk_cli:latest bash
+# QMK-based Keyboard Firmware
+
+Firmware for my QMK-based keyboards.
+Using docker, you can build [`qmk/qmk_firmware`](https://github.com/qmk/qmk_firmware) without placing it locally.
+
+Example:
+
+```console
+$ ./scripts/docker_qmk_compile yuiop/yuiop60hh5 default
 ```
 
-```
-git clone --branch 0.22.14 --depth 1 --recurse-submodules --shallow-submodules http://github.com/qmk/qmk_firmware /qmk_firmware
-```
+## Directory structure
 
-```
-docker run --rm -it -v qmk_firmware://qmk_firmware -v ./build://qmk_firmware/.build -v ./keyboards://qmk_firmware/keyboards -w //qmk_firmware ghcr.io/qmk/qmk_cli:latest bash
-```
-
-```
-qmk compile -j 4 -e SKIP_GIT=yes -e KEEP_BIN=yes -e COLOR=false -kb {keyboard} -km {keymap}
-```
-
-```
-docker run --rm -it -v "$QMKFM_VOLUME":/qmk_firmware -w /qmk_firmware ghcr.io/qmk/qmk_cli:latest
-```
+* `build/` - Output destination for built files. Equivalent to the `.build/` directory in QMK.
+    * `build/*.hex` - Built firmwares
+* `keyboards/` - Directory containing keyboard-specific source files. Overrides the QMK `keyboards/` directory.
+* `scripts/` - Directory where scripts are stored
+    * `scripts/docker_qmk_compile` - A script that runs `qmk compile` in Docker. Two arguments are required: the keyboard and keymap.
+    * `scripts/docker_run` - Run commands in the qmk build environment container or log in to that container
