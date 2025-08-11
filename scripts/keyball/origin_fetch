@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 KEYBALL_DIR="${KEYBALL_DIR:-../keyball/qmk_firmware/keyboards/keyball}"
 
@@ -12,4 +12,9 @@ if [ ! -d "$KEYBALL_DIR" ] ; then
 fi
 
 cp -Rp "$KEYBALL_DIR" keyboards/
-#find keyboards/keyball -type f -regex '.*\.\(c\|h\|json\|md\)' | xargs dos2unix -q
+
+find keyboards/keyball -type f -name .noci | xargs -r rm
+
+if which dos2unix > /dev/null 2>&1 ; then
+  find keyboards/keyball -type f -regex '.*\.\(c\|h\|json\|md\)' | xargs -r dos2unix -q
+fi
