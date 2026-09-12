@@ -32,9 +32,10 @@ matrix_row_t matrix_mask[MATRIX_ROWS] = {
 #    include <string.h>
 #    include "ws2812.h"
 
-#    ifndef LAS_LAYER_LED_VALUE
-#        define LAS_LAYER_LED_VALUE 64
-#    endif
+// Adjusted to target 50 mcd for each color.
+#define LAS_DRIVE_RED   23
+#define LAS_DRIVE_GREEN 10
+#define LAS_DRIVE_BLUE  42
 
 typedef struct {
     bool  layers[3];
@@ -72,23 +73,23 @@ void las_housekeeping(void) {
     LED_TYPE leds[3] = {0};
     // apply layers state
     if (las.layers[0]) {
-        las_led_set(&leds[0], LAS_LAYER_LED_VALUE, LAS_LAYER_LED_VALUE, LAS_LAYER_LED_VALUE);
+        las_led_set(&leds[0], LAS_DRIVE_RED, LAS_DRIVE_GREEN, LAS_DRIVE_BLUE);
     }
     if (las.layers[1]) {
-        las_led_set(&leds[1], LAS_LAYER_LED_VALUE, LAS_LAYER_LED_VALUE, LAS_LAYER_LED_VALUE);
+        las_led_set(&leds[1], LAS_DRIVE_RED, LAS_DRIVE_GREEN, LAS_DRIVE_BLUE);
     }
     if (las.layers[2]) {
-        las_led_set(&leds[2], LAS_LAYER_LED_VALUE, LAS_LAYER_LED_VALUE, LAS_LAYER_LED_VALUE);
+        las_led_set(&leds[2], LAS_DRIVE_RED, LAS_DRIVE_GREEN, LAS_DRIVE_BLUE);
     }
     // apply locks state
     if (las.locks.caps_lock) {
-        leds[0].r = 0xff;
+        leds[0].r = LAS_DRIVE_RED;
     }
     if (las.locks.scroll_lock) {
-        leds[1].g = 0xff;
+        leds[1].g = LAS_DRIVE_GREEN;
     }
     if (las.locks.num_lock) {
-        leds[2].b = 0xff;
+        leds[2].b = LAS_DRIVE_BLUE;
     }
     // update WS2812 array
     ws2812_setleds(leds, 3);
