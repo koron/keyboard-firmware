@@ -4,6 +4,7 @@ set -eu
 
 QMKFM_VERSION="${QMKFM_VERSION:-0.22.14}"
 QMKFM_VOLUME="qmkfm-${QMKFM_VERSION}"
+QMKCLI_TAG="${QMKCLI_TAG:-latest}"
 
 DOCKER_CMD="${DOCKER_CMD:-docker}"
 

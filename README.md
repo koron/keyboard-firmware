@@ -17,3 +17,9 @@ $ ./scripts/docker_qmk_compile yuiop/yuiop60hh5 default
 * `scripts/` - Directory where scripts are stored
     * `scripts/docker_qmk_compile` - A script that runs `qmk compile` in Docker. Two arguments are required: the keyboard and keymap.
     * `scripts/docker_run` - Run commands in the qmk build environment container or log in to that container
+
+# Environment variables
+
+-   `DOCKER_CMD` - Override `docker` command.
+-   `QMKFM_VERSION` - Specify qmk\_firmware version (default: 0.22.14)
+-   `QMKCLI_TAG` - Specify a tag for ghcr.io/qmk/qmk\_cli (default: latest)
