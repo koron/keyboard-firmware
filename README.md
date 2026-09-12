@@ -18,8 +18,24 @@ $ ./scripts/docker_qmk_compile yuiop/yuiop60hh5 default
     * `scripts/docker_qmk_compile` - A script that runs `qmk compile` in Docker. Two arguments are required: the keyboard and keymap.
     * `scripts/docker_run` - Run commands in the qmk build environment container or log in to that container
 
-# Environment variables
+## Environment variables
 
 -   `DOCKER_CMD` - Override `docker` command.
--   `QMKFM_VERSION` - Specify qmk\_firmware version (default: 0.22.14)
--   `QMKCLI_TAG` - Specify a tag for ghcr.io/qmk/qmk\_cli (default: latest)
+-   `QMKFM_VERSION` - Specify qmk\_firmware version (`default: 0.22.14`)
+-   `QMKCLI_IMAGE` - Specify qmk\_cli image (default: `ghcr.io/qmk/qmk_cli:latest`)
+
+## `qmk_cli` image
+
+To build firmware based on QMK 0.22.14, you need to use a slightly older
+`qmk_cli` image. Its ID is
+
+    sha256:2dc05fc9f32efebd6b05c2b8676ee548358bc7e151e9dbf4dac6b6eed4513b07
+
+You can pull that image locally as `ghcr.io/qmk/qmk_cli:latest` by running the
+following commands.
+
+```bash
+docker pull ghcr.io/qmk/qmk_cli@sha256:2dc05fc9f32efebd6b05c2b8676ee548358bc7e151e9dbf4dac6b6eed4513b07
+
+docker tag ghcr.io/qmk/qmk_cli@sha256:2dc05fc9f32efebd6b05c2b8676ee548358bc7e151e9dbf4dac6b6eed4513b07 ghcr.io/qmk/qmk_cli:latest
+```
