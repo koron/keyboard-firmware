@@ -15,6 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 
+#include "usb_device_state.h"
+
 // clang-format off
 matrix_row_t matrix_mask[MATRIX_ROWS] = {
     0b111111111111111,
@@ -128,4 +130,12 @@ void housekeeping_task_kb(void) {
 #ifdef LED_ARRAY_STATE
     las_housekeeping();
 #endif
+}
+
+void notify_usb_device_state_change_kb(enum usb_device_state usb_device_state) {
+    if (usb_device_state == USB_DEVICE_STATE_SUSPEND) {
+        led_t zero = { .raw = 0 };
+        las_led_update(zero);
+    }
+    notify_usb_device_state_change_user(usb_device_state);
 }
