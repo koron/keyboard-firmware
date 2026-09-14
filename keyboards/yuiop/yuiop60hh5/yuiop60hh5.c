@@ -15,8 +15,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 
-#include "usb_device_state.h"
-
 // clang-format off
 matrix_row_t matrix_mask[MATRIX_ROWS] = {
     0b111111111111111,
@@ -39,34 +37,24 @@ matrix_row_t matrix_mask[MATRIX_ROWS] = {
 #define LAS_DRIVE_GREEN 10
 #define LAS_DRIVE_BLUE  42
 
+static void setrgb(LED_TYPE *led, uint8_t r, uint8_t g, uint8_t b) {
+    LED_TYPE v = { .r = r, .g = g, .b = b };
+    *led = v;
+}
+
 typedef struct {
     bool  layers[3];
     led_t locks;
 } las_state_t;
 
-void las_led_set(LED_TYPE *led, uint8_t r, uint8_t g, uint8_t b) {
-    LED_TYPE v = { .r = r, .g = g, .b = b };
-    *led = v;
-}
+static las_state_t las = {0};
 
 void las_init(void) {
     LED_TYPE leds[3] = {0};
     ws2812_setleds(leds, 3);
 }
 
-static las_state_t las = {0};
-
-void las_layer_state_set(layer_state_t state) {
-    las.layers[0] = layer_state_cmp(state, 1);
-    las.layers[1] = layer_state_cmp(state, 2);
-    las.layers[2] = layer_state_cmp(state, 3);
-}
-
-void las_led_update(led_t led_state) {
-    las.locks = led_state;
-}
-
-void las_housekeeping(void) {
+void las_commit(void) {
     static las_state_t prev = {0};
     if (memcmp(&las, &prev, sizeof(las)) == 0) {
         return;
@@ -75,13 +63,13 @@ void las_housekeeping(void) {
     LED_TYPE leds[3] = {0};
     // apply layers state
     if (las.layers[0]) {
-        las_led_set(&leds[0], LAS_DRIVE_RED, LAS_DRIVE_GREEN, LAS_DRIVE_BLUE);
+        setrgb(&leds[0], LAS_DRIVE_RED, LAS_DRIVE_GREEN, LAS_DRIVE_BLUE);
     }
     if (las.layers[1]) {
-        las_led_set(&leds[1], LAS_DRIVE_RED, LAS_DRIVE_GREEN, LAS_DRIVE_BLUE);
+        setrgb(&leds[1], LAS_DRIVE_RED, LAS_DRIVE_GREEN, LAS_DRIVE_BLUE);
     }
     if (las.layers[2]) {
-        las_led_set(&leds[2], LAS_DRIVE_RED, LAS_DRIVE_GREEN, LAS_DRIVE_BLUE);
+        setrgb(&leds[2], LAS_DRIVE_RED, LAS_DRIVE_GREEN, LAS_DRIVE_BLUE);
     }
     // apply locks state
     if (las.locks.caps_lock) {
@@ -95,6 +83,16 @@ void las_housekeeping(void) {
     }
     // update WS2812 array
     ws2812_setleds(leds, 3);
+}
+
+void las_layer_state_set(layer_state_t state) {
+    las.layers[0] = layer_state_cmp(state, 1);
+    las.layers[1] = layer_state_cmp(state, 2);
+    las.layers[2] = layer_state_cmp(state, 3);
+}
+
+void las_led_update(led_t led_state) {
+    las.locks = led_state;
 }
 
 #endif
@@ -111,6 +109,7 @@ void keyboard_post_init_kb(void) {
 layer_state_t layer_state_set_kb(layer_state_t state) {
 #ifdef LED_ARRAY_STATE
     las_layer_state_set(state);
+    las_commit();
 #endif
     return state;
 }
@@ -122,20 +121,7 @@ bool led_update_kb(led_t led_state) {
     }
 #ifdef LED_ARRAY_STATE
     las_led_update(led_state);
+    las_commit();
 #endif
     return true;
-}
-
-void housekeeping_task_kb(void) {
-#ifdef LED_ARRAY_STATE
-    las_housekeeping();
-#endif
-}
-
-void notify_usb_device_state_change_kb(enum usb_device_state usb_device_state) {
-    if (usb_device_state == USB_DEVICE_STATE_SUSPEND) {
-        led_t zero = { .raw = 0 };
-        las_led_update(zero);
-    }
-    notify_usb_device_state_change_user(usb_device_state);
 }
